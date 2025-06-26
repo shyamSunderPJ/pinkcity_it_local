@@ -1,0 +1,107 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-05-20 09:54:45.348230",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "title",
+  "assigned_to",
+  "create_npd",
+  "npd",
+  "npd_state",
+  "status",
+  "design_attachment_id",
+  "column_break_ckk4l",
+  "attachment",
+  "preview"
+ ],
+ "fields": [
+  {
+   "columns": 1,
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Description",
+   "read_only": 1
+  },
+  {
+   "columns": 1,
+   "fieldname": "assigned_to",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Assigned to",
+   "read_only": 1
+  },
+  {
+   "columns": 2,
+   "fieldname": "create_npd",
+   "fieldtype": "Button",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Create NPD Sheet"
+  },
+  {
+   "columns": 2,
+   "fieldname": "npd",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "NPD ID",
+   "options": "NPD"
+  },
+  {
+   "columns": 2,
+   "fieldname": "npd_state",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "PD State"
+  },
+  {
+   "columns": 2,
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Client Status",
+   "options": "\nAccepted\nRejected"
+  },
+  {
+   "fieldname": "design_attachment_id",
+   "fieldtype": "Data",
+   "label": "Design Attachment ID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_ckk4l",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "attachment",
+   "fieldtype": "Attach",
+   "hidden": 1,
+   "label": "Attachment",
+   "read_only": 1
+  },
+  {
+   "fieldname": "preview",
+   "fieldtype": "Image",
+   "label": "Preview",
+   "options": "attachment"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-05-20 09:54:45.348230",
+ "modified_by": "Administrator",
+ "module": "PinkCity CRM",
+ "name": "Opportunity NPD first Costing CT",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -1,0 +1,182 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-06-02 14:09:49.569463",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "order_no",
+  "company",
+  "work_order",
+  "user",
+  "date",
+  "column_break_ygkc1",
+  "image",
+  "section_break_cz9sx",
+  "customer",
+  "item",
+  "design_category",
+  "size",
+  "product_delivery_date",
+  "column_break_ljlc5",
+  "karat",
+  "bag_quantity",
+  "gross_weight",
+  "main_metal_weight",
+  "column_break_betfp",
+  "total_order_quantity",
+  "customer_instruction",
+  "design_instruction",
+  "customer_design"
+ ],
+ "fields": [
+  {
+   "fieldname": "order_no",
+   "fieldtype": "Link",
+   "label": "Sales Order No.",
+   "options": "Sales Order"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "work_order",
+   "fieldtype": "Link",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "in_preview": 1,
+   "in_standard_filter": 1,
+   "label": "Work Order",
+   "options": "Work Order"
+  },
+  {
+   "fieldname": "user",
+   "fieldtype": "Data",
+   "label": "User "
+  },
+  {
+   "fieldname": "date",
+   "fieldtype": "Data",
+   "label": "Date "
+  },
+  {
+   "fieldname": "column_break_ygkc1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "image",
+   "fieldtype": "Image",
+   "label": "Image"
+  },
+  {
+   "fieldname": "section_break_cz9sx",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fetch_from": "order_no.customer",
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "label": "Item",
+   "options": "Item"
+  },
+  {
+   "fetch_from": "item.item_group",
+   "fieldname": "design_category",
+   "fieldtype": "Data",
+   "label": "Design Category"
+  },
+  {
+   "fieldname": "size",
+   "fieldtype": "Data",
+   "label": "Size"
+  },
+  {
+   "fieldname": "product_delivery_date",
+   "fieldtype": "Data",
+   "label": "Product Delivery Date"
+  },
+  {
+   "fieldname": "column_break_ljlc5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "karat",
+   "fieldtype": "Data",
+   "label": "Karat"
+  },
+  {
+   "fieldname": "gross_weight",
+   "fieldtype": "Data",
+   "label": "Gross Weight"
+  },
+  {
+   "fieldname": "main_metal_weight",
+   "fieldtype": "Data",
+   "label": "Main Metal Weight"
+  },
+  {
+   "fieldname": "column_break_betfp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_order_quantity",
+   "fieldtype": "Data",
+   "label": "Total Order Quantity"
+  },
+  {
+   "fieldname": "customer_instruction",
+   "fieldtype": "Data",
+   "label": "Customer Instruction"
+  },
+  {
+   "fieldname": "design_instruction",
+   "fieldtype": "Data",
+   "label": "Design Instruction"
+  },
+  {
+   "fieldname": "customer_design",
+   "fieldtype": "Data",
+   "label": "Customer Design"
+  },
+  {
+   "fieldname": "bag_quantity",
+   "fieldtype": "Data",
+   "label": "Bag Quantity"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-06-04 12:55:40.211624",
+ "modified_by": "Administrator",
+ "module": "Pinkcity Manufacturing",
+ "name": "Bag Details",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

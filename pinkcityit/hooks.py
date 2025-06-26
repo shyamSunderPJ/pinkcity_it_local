@@ -127,23 +127,45 @@ app_license = "MIT"
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-#	"all": [
-#		"pinkcityit.tasks.all"
-#	],
-#	"daily": [
-#		"pinkcityit.tasks.daily"
-#	],
-#	"hourly": [
-#		"pinkcityit.tasks.hourly"
-#	],
-#	"weekly": [
-#		"pinkcityit.tasks.weekly"
-#	],
-#	"monthly": [
-#		"pinkcityit.tasks.monthly"
-#	],
-# }
+scheduler_events = {
+	"cron": {
+        "10 08 * * *": [
+            "pinkcityit.pinkcity_hr.doctype.essl_company.essl_company.CheckinMahapura"  
+        ],
+        "25 08 * * *": [
+            "pinkcityit.pinkcity_hr.doctype.essl_company.essl_company.CheckinUnit1"
+        ],
+        "40 08 * * *": [
+            "pinkcityit.pinkcity_hr.doctype.essl_company.essl_company.CheckinUnit2"
+        ],
+        "55 08 * * *": [
+            "pinkcityit.pinkcity_hr.doctype.essl_company.essl_company.CheckinColorstone"
+        ],
+         "30 13 * * *": [
+            "pinkcityit.pinkcity_hr.doctype.essl_company.essl_company.applyAttendance"
+        ]
+        
+
+    },
+	"all": [
+		# "pinkcityit.tasks.all"
+	],
+	"daily": [
+		# "pinkcityit.tasks.daily"
+        "pinkcityit.pinkcity_manufacturing.doctype.daily_transaction.daily_transaction.submit_daily_transaction",
+        "pinkcityit.pinkcity_hr.doctype.essl_company.essl_company.updateEmployeeLeave",
+        # "pinkcityit.pinkcity_manufacturing.doctype.plating_transaction.plating_transaction.submit_ptransaction"
+	],
+	"hourly": [
+		# "pinkcityit.tasks.hourly"
+	],
+	"weekly": [
+		# "pinkcityit.tasks.weekly"
+	],
+	"monthly": [
+		# "pinkcityit.tasks.monthly"
+	],
+}
 
 # Testing
 # -------

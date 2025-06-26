@@ -1,0 +1,63 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-05-20 09:53:13.151258",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "npd",
+  "assigned_to",
+  "create_costing_sheet",
+  "costing",
+  "sheet_status"
+ ],
+ "fields": [
+  {
+   "fieldname": "npd",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "NPD",
+   "options": "NPD"
+  },
+  {
+   "fieldname": "assigned_to",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Assigned To",
+   "options": "Designers"
+  },
+  {
+   "fieldname": "create_costing_sheet",
+   "fieldtype": "Button",
+   "in_list_view": 1,
+   "label": "Create Costing "
+  },
+  {
+   "fieldname": "costing",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Costing ID",
+   "options": "Costing"
+  },
+  {
+   "fieldname": "sheet_status",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Sheet Status"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-05-20 09:53:13.151258",
+ "modified_by": "Administrator",
+ "module": "PinkCity CRM",
+ "name": "Opportunity NPD first then Costing CT",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
