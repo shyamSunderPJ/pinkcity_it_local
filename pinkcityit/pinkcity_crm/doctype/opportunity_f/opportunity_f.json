@@ -100,6 +100,12 @@
    "fieldtype": "Column Break"
   },
   {
+   "fetch_from": "party_name.client_code",
+   "fieldname": "client_code",
+   "fieldtype": "Data",
+   "label": "Client Code"
+  },
+  {
    "fieldname": "section_break_14",
    "fieldtype": "Section Break",
    "label": "Opportunity Value"
@@ -161,21 +167,15 @@
    "fieldname": "development_details",
    "fieldtype": "Table",
    "label": "Development Details",
-   "options": "Opp NPD CT"
-  },
-  {
-   "fetch_from": "party_name.client_code",
-   "fieldname": "client_code",
-   "fieldtype": "Data",
-   "label": "Client Code"
+   "options": "Opp NPD CT F"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-05-22 16:58:35.463273",
+ "modified": "2025-07-03 11:26:05.775216",
  "modified_by": "Administrator",
  "module": "PinkCity CRM",
- "name": "Opportunity New",
+ "name": "Opportunity F",
  "owner": "Administrator",
  "permissions": [
   {

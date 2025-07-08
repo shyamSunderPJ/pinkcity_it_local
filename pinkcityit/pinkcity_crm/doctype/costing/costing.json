@@ -134,6 +134,7 @@
   "plating",
   "column_break_ugfio",
   "micron",
+  "plat_micron",
   "column_break_9whpj",
   "gold_kt",
   "column_break_g5ft7",
@@ -151,7 +152,7 @@
   "column_break_qmkgx",
   "micron_plating_ounce_rate",
   "column_break_sxm5m",
-  "plating_charges_per_gram_of_non_chain_product",
+  "plating_price",
   "plating_charges_per_gram_of_chain_product",
   "plating_price_non_chain_products",
   "section_break_jasa1",
@@ -963,10 +964,10 @@
   },
   {
    "fieldname": "plating",
-   "fieldtype": "Select",
+   "fieldtype": "Link",
    "in_standard_filter": 1,
    "label": "Plating Type",
-   "options": "\nFlash Gold Plating\nMicron Plating\nFlash Rhodium"
+   "options": "Plating Master"
   },
   {
    "fieldname": "column_break_ugfio",
@@ -974,9 +975,9 @@
   },
   {
    "fieldname": "micron",
-   "fieldtype": "Select",
+   "fieldtype": "Link",
    "label": "Micron",
-   "options": "\n0.25 Micron\n0.50 Micron\n0.75 Micron\n1.00 Micron\n1.50 Micron\n2.00 Micron\n2.50 Micron\n3.00 Micron\nFlash Rhodium\n3 to 5 miles\nN/A\n0.25 (2600 - 3000)\n0.50 (2600 - 3000)\n1.00 (2600 - 3000)\n1.50 (2600 - 3000)\n2.00 (2600 - 3000)\n2.50 (2600 - 3000)\n3.00 (2600 - 3000)\nFlash Rhodium (2600 - 3000)\n3 to 5 miles (2600 - 3000)"
+   "options": "Micron"
   },
   {
    "fieldname": "column_break_9whpj",
@@ -1066,15 +1067,6 @@
   },
   {
    "default": "0",
-   "fieldname": "plating_charges_per_gram_of_non_chain_product",
-   "fieldtype": "Currency",
-   "hidden": 1,
-   "label": "Plating Price",
-   "options": "currency",
-   "read_only": 1
-  },
-  {
-   "default": "0",
    "fieldname": "plating_charges_per_gram_of_chain_product",
    "fieldtype": "Currency",
    "hidden": 1,
@@ -1085,9 +1077,8 @@
   {
    "default": "0",
    "fieldname": "plating_price_non_chain_products",
-   "fieldtype": "Currency",
+   "fieldtype": "Data",
    "label": "Plating Price ",
-   "options": "currency",
    "read_only": 1
   },
   {
@@ -1105,20 +1096,14 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "product_type",
-   "fieldtype": "Select",
-   "label": "Product Type",
-   "options": "\nChain Product\nNON - Chain Product\n18K Gold For Chains\n24K Gold Plating For Non chain Products\n18KT with .5 um 23KT Gold For Chains"
-  },
-  {
    "fieldname": "column_break_fy1xs",
    "fieldtype": "Column Break"
   },
   {
    "fieldname": "uom_in_plating",
-   "fieldtype": "Select",
+   "fieldtype": "Link",
    "label": "Price UOM",
-   "options": "\nPer Pcs (On The Basis Of Surface Area)\nPer Gram"
+   "options": "UOM"
   },
   {
    "fieldname": "column_break_l0pqc",
@@ -1212,9 +1197,9 @@
   },
   {
    "fieldname": "product_types",
-   "fieldtype": "Select",
+   "fieldtype": "Link",
    "label": "Product Type",
-   "options": "\nChain Product\nNON - Chain Product\n18K Gold For Chains\n24K Gold Plating For Non chain Products\n18KT with .5 um 23KT Gold For Chains"
+   "options": "Product Type"
   },
   {
    "fieldname": "column_break_3qfjz",
@@ -1805,7 +1790,7 @@
    "fieldname": "opportunity__id",
    "fieldtype": "Link",
    "label": "Opportunity ID",
-   "options": "Opportunity New",
+   "options": "Opportunity F",
    "read_only": 1
   },
   {
@@ -1826,7 +1811,7 @@
    "fieldname": "npd_id",
    "fieldtype": "Link",
    "label": "NPD Id",
-   "options": "NPD"
+   "options": "Product Development"
   },
   {
    "fieldname": "column_break_8vbgj",
@@ -1837,6 +1822,26 @@
    "fieldname": "remove_opp_id",
    "fieldtype": "Button",
    "label": "Remove Id"
+  },
+  {
+   "default": "0",
+   "fieldname": "plating_price",
+   "fieldtype": "Currency",
+   "label": "Plating Price",
+   "options": "currency",
+   "read_only": 1
+  },
+  {
+   "fieldname": "plat_micron",
+   "fieldtype": "Link",
+   "label": "plat micron",
+   "options": "Micron"
+  },
+  {
+   "fieldname": "product_type",
+   "fieldtype": "Link",
+   "label": "Product Type",
+   "options": "Product Type"
   }
  ],
  "image_field": "image",
@@ -1844,7 +1849,7 @@
  "is_submittable": 1,
  "links": [],
  "make_attachments_public": 1,
- "modified": "2025-06-19 10:46:28.734114",
+ "modified": "2025-07-07 17:11:10.358593",
  "modified_by": "Administrator",
  "module": "PinkCity CRM",
  "name": "Costing",

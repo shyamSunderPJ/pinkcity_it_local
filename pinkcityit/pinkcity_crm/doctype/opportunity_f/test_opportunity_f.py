@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestOpportunityNew(FrappeTestCase):
+class TestOpportunityF(FrappeTestCase):
 	pass

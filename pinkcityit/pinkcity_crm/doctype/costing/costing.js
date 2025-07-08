@@ -192,7 +192,7 @@ frappe.ui.form.on('Costing', {
         //   calculate_total_cost(frm);
         updateHtmlFormFields(frm);
         updateMetalTypeLabel(frm, frm.doc.metal_type);
-        updatePlatingProductType(frm);
+        // updatePlatingProductType(frm);
 
         frm.get_field("setting_child").grid.grid_buttons.addClass('hidden');
         frm.get_field("diamond_setting_child").grid.grid_buttons.addClass('hidden');
@@ -313,6 +313,121 @@ frappe.ui.form.on('Costing', {
             }
         });
 
+        frm.set_query('uom_in_plating', () => {
+            return {
+                filters: {
+                    name: ['in', ['Per Gram', 'Per Pcs (On The Basis Of Surface Area)']]
+                }
+            }
+        });
+
+        // if (frm.doc.plating === "Micron") {
+        //     frm.set_query('plat_micron', () => {
+        //         return {
+        //             filters: {
+        //                 name: ['in', ['0.25 Micron',
+        //                     '0.50 Micron',
+        //                     '1.00 Micron',
+        //                     '1.50 Micron',
+        //                     '2.00 Micron',
+        //                     '2.50 Micron',
+        //                     '3.00 Micron',
+        //                     'N/A',
+        //                     '────────────────────',
+        //                     '0.25 (2600 - 3000)',
+        //                     '0.50 (2600 - 3000)',
+        //                     '1.00 (2600 - 3000)',
+        //                     '1.50 (2600 - 3000)',
+        //                     '2.00 (2600 - 3000)',
+        //                     '2.50 (2600 - 3000)',
+        //                     '3.00 (2600 - 3000)']]
+        //             }
+        //         }
+        //     });
+        // } else if (frm.doc.plating === "Flash Gold Plating") {
+        //     frm.set_query('plat_micron', () => {
+        //         return {
+        //             filters: {
+        //                 name: ['in', ["3 to 5 miles",
+        //                     "3 to 5 miles (2600 - 3000)"
+        //                 ]]
+        //             }
+        //         }
+        //     });
+        // } else if (frm.doc.plating === "Flash Rhodium") {
+        //     frm.set_query('plat_micron', () => {
+        //         return {
+        //             filters: {
+        //                 name: ['in', ["Flash Rhodium",
+        //                     "Flash Rhodium (2600 - 3000)"
+        //                 ]]
+        //             }
+        //         }
+        //     });
+        // }
+        frm.set_query('micron', () => {
+            if (frm.doc.plating === "Micron") {
+                return {
+                    filters: {
+                        name: ['in', [
+                            '0.25 Micron', '0.50 Micron', '1.00 Micron',
+                            '1.50 Micron', '2.00 Micron', '2.50 Micron',
+                            '3.00 Micron', 'N/A',
+                            '0.25 (2600 - 3000)', '0.50 (2600 - 3000)',
+                            '1.00 (2600 - 3000)', '1.50 (2600 - 3000)',
+                            '2.00 (2600 - 3000)', '2.50 (2600 - 3000)',
+                            '3.00 (2600 - 3000)'
+                        ]]
+                    }
+                };
+            } else if (frm.doc.plating === "Flash Gold Plating") {
+                return {
+                    filters: {
+                        name: ['in', [
+                            '3 to 5 miles', '3 to 5 miles (2600 - 3000)'
+                        ]]
+                    }
+                };
+            } else if (frm.doc.plating === "Flash Rhodium") {
+                return {
+                    filters: {
+                        name: ['in', [
+                            'Flash Rhodium', 'Flash Rhodium (2600 - 3000)'
+                        ]]
+                    }
+                };
+            } else {
+                return {}; // fallback
+            }
+        });
+
+        frm.set_query('type', () => {
+            if (frm.doc.plating === "Micron") {
+
+                if (frm.doc.micron === "2.50 Micron") {
+                    return {
+                        filters: {
+                            name: ['in', [
+                                'Chain Product',
+                                'NON - Chain Product',
+                                '18K Gold For Chains',
+                                '24K Gold Plating For Non chain Products',
+                                '18KT with .5 um 23KT Gold For Chains'
+                            ]]
+                        }
+                    };
+                } else {
+                    return {
+                        filters: {
+                            name: ['in', [
+                                'Chain Product',
+                                'NON - Chain Product'
+                            ]]
+                        }
+                    };
+                }
+            }
+        });
     },
 
 
@@ -337,7 +452,7 @@ frappe.ui.form.on('Costing', {
     },
 
     customer: function (frm) {
-        updatePlatingProductType(frm);
+        // updatePlatingProductType(frm);
         if (frm.doc.customer == "Varni Jewels INC(HB)") {
             frm.set_value('usd_converstion_rate', 80);
         } else {
@@ -548,12 +663,18 @@ frappe.ui.form.on('Costing', {
     // =========== Micron Plating =====================================================
     plating: function (frm) {
         generate_code(frm);
-        calculate_plating_pricing(frm);
+        fetch_plating_price_links(frm);
+        // calculate_plating_pricing(frm); 
     },
-
+    plat_micron: function (frm) {
+        generate_code(frm);
+        fetch_plating_price_links(frm);
+        // calculate_plating_pricing(frm);
+    },
     micron: function (frm) {
         generate_code(frm);
-        calculate_plating_pricing(frm);
+        fetch_plating_price_links(frm);
+        // calculate_plating_pricing(frm);
     },
 
     gold_kt: function (frm) {
@@ -579,13 +700,13 @@ frappe.ui.form.on('Costing', {
     micron_plating_ounce_rate: function (frm) {
         calculate_plating_pricing(frm);
     },
-
-    product_type: function (frm) {
-        calculate_plating_pricing(frm);
+    type: function (frm) {
+        fetch_plating_price_links(frm);
     },
 
     uom_in_plating: function (frm) {
-        calculate_plating_pricing(frm);
+        fetch_plating_price_links(frm);
+        // calculate_plating_pricing(frm);
     },
 
     plating_charge: function (frm, cdt, cdn) {
@@ -596,11 +717,11 @@ frappe.ui.form.on('Costing', {
     // =========== Second Plating =====================================================
     plating_types: function (frm) {
         generate_code_second_plating(frm);
-        calculate_plating_pricing_second_plating(frm);
+        // calculate_plating_pricing_second_plating(frm);
     },
     microns: function (frm) {
         generate_code_second_plating(frm);
-        calculate_plating_pricing_second_plating(frm);
+        // calculate_plating_pricing_second_plating(frm);
     },
     gold_kts: function (frm) {
         generate_code_second_plating(frm);
@@ -614,24 +735,24 @@ frappe.ui.form.on('Costing', {
     anti_tarnishs: function (frm) {
         generate_code_second_plating(frm);
     },
-    surface: function (frm) {
-        calculate_plating_pricing_second_plating(frm);
-    },
-    design_weightss: function (frm) {
-        calculate_plating_pricing_second_plating(frm);
-    },
-    micron_plating_ounce_rate_second_plating: function (frm) {
-        calculate_plating_pricing_second_plating(frm);
-    },
-    plating_charg: function (frm, cdt, cdn) {
-        calculate_plating_pricing_second_plating(frm);
-    },
-    product_types: function (frm) {
-        calculate_plating_pricing_second_plating(frm);
-    },
-    pric_uom: function (frm) {
-        calculate_plating_pricing_second_plating(frm);
-    },
+    // surface: function (frm) {
+    //     calculate_plating_pricing_second_plating(frm);
+    // },
+    // design_weightss: function (frm) {
+    //     calculate_plating_pricing_second_plating(frm);
+    // },
+    // micron_plating_ounce_rate_second_plating: function (frm) {
+    //     calculate_plating_pricing_second_plating(frm);
+    // },
+    // plating_charg: function (frm, cdt, cdn) {
+    //     calculate_plating_pricing_second_plating(frm);
+    // },
+    // product_types: function (frm) {
+    //     calculate_plating_pricing_second_plating(frm);
+    // },
+    // pric_uom: function (frm) {
+    //     calculate_plating_pricing_second_plating(frm);
+    // },
 
     /// ==========================================  Plating ===========================  end ========================================
 
@@ -1461,40 +1582,40 @@ frappe.ui.form.on('CO Value Addition', {
 
 /// ==========================================  Metal Base ===========================  start ======================================
 
-function updatePlatingProductType(frm) {
+// function updatePlatingProductType(frm) {
 
-    if (frm.doc.customer) {
-        if (frm.doc.customer === "Monica Vinader Ltd") {
-            // Set specific options for "Monica Vinader Ltd" for both fields
-            frm.set_df_property('product_types', 'options', [
-                "Chain Product",
-                "NON - Chain Product",
-                "18K Gold For Chains",
-                "24K Gold Plating For Non chain Products",
-                "18KT with .5 um 23KT Gold For Chains"
-            ]);
-            frm.set_df_property('product_type', 'options', [
-                "Chain Product",
-                "NON - Chain Product",
-                "18K Gold For Chains",
-                "24K Gold Plating For Non chain Products",
-                "18KT with .5 um 23KT Gold For Chains"
-            ]);
-        } else {
-            frm.set_df_property('product_types', 'options', [
-                "Chain Product",
-                "NON - Chain Product"
-            ]);
-            frm.set_df_property('product_type', 'options', [
-                "Chain Product",
-                "NON - Chain Product"
-            ]);
-        }
-    }
+//     if (frm.doc.customer) {
+//         if (frm.doc.customer === "Monica Vinader Ltd") {
+//             // Set specific options for "Monica Vinader Ltd" for both fields
+//             frm.set_df_property('product_types', 'options', [
+//                 "Chain Product",
+//                 "NON - Chain Product",
+//                 "18K Gold For Chains",
+//                 "24K Gold Plating For Non chain Products",
+//                 "18KT with .5 um 23KT Gold For Chains"
+//             ]);
+//             frm.set_df_property('type', 'options', [
+//                 "Chain Product",
+//                 "NON - Chain Product",
+//                 "18K Gold For Chains",
+//                 "24K Gold Plating For Non chain Products",
+//                 "18KT with .5 um 23KT Gold For Chains"
+//             ]);
+//         } else {
+//             frm.set_df_property('product_types', 'options', [
+//                 "Chain Product",
+//                 "NON - Chain Product"
+//             ]);
+//             frm.set_df_property('type', 'options', [
+//                 "Chain Product",
+//                 "NON - Chain Product"
+//             ]);
+//         }
+//     }
 
-    frm.refresh_field('product_types');
-    frm.refresh_field('product_type');
-}
+//     frm.refresh_field('type');
+//     frm.refresh_field('product_type');
+// }
 
 
 function calculate_us_dollar_per_gram(frm) {
@@ -1767,7 +1888,7 @@ function calculate_revise_weight(frm) {
 
 
     calculate_plating_pricing(frm)
-    calculate_plating_pricing_second_plating(frm)
+    // calculate_plating_pricing_second_plating(frm)
 }
 
 
@@ -2600,317 +2721,208 @@ function update_master_total_stone_cost_in_setting(frm) {
 
 function generate_code(frm) {
     var plating_value = frm.doc.plating;
-    var micron_value = frm.doc.micron;
-    var gold_kt_value = frm.doc.gold_kt;
-    var color_value = frm.doc.color;
-    var gold_value = frm.doc.gold;
-    var anti_tarnish_value = frm.doc.anti_tarnish;
+    // var micron_value = frm.doc.plat_micron;
+    // var gold_kt_value = frm.doc.gold_kt;
+    // var color_value = frm.doc.color;
+    // var gold_value = frm.doc.gold;
+    // var anti_tarnish_value = frm.doc.anti_tarnish;
 
     var plating_codes = {
         "Flash Gold Plating": "PLT-FLSH",
         "Flash Rhodium": "PLT-FLSH",
-        "Micron Plating": "PLT-MIC",
+        "Micron": "PLT-MIC",
     };
 
     var plating_code = plating_codes[plating_value] || "";
-    if (plating_value === "Micron Plating") {
-        frm.set_df_property('micron', 'read_only', 0);
-        frm.set_df_property('gold_kt', 'read_only', 0);
-        frm.set_df_property('color', 'read_only', 0);
-        frm.set_df_property('gold', 'read_only', 0);
-        frm.set_df_property('anti_tarnish', 'read_only', 0);
+    // if (plating_value === "Micron") {
+    //     frm.set_df_property('plat_micron', 'read_only', 0);
+    //     frm.set_df_property('gold_kt', 'read_only', 0);
+    //     frm.set_df_property('color', 'read_only', 0);
+    //     frm.set_df_property('gold', 'read_only', 0);
+    //     frm.set_df_property('anti_tarnish', 'read_only', 0);
 
-        frm.set_df_property('micron', 'options', [
-            "0.25 Micron",
-            "0.50 Micron",
-            "1.00 Micron",
-            "1.50 Micron",
-            "2.00 Micron",
-            "2.50 Micron",
-            "3.00 Micron",
-            "N/A",
-            "────────────────────",
-            "0.25 (2600 - 3000)",
-            "0.50 (2600 - 3000)",
-            "1.00 (2600 - 3000)",
-            "1.50 (2600 - 3000)",
-            "2.00 (2600 - 3000)",
-            "2.50 (2600 - 3000)",
-            "3.00 (2600 - 3000)",
-        ].join('\n'));
+    //     frm.set_df_property('plat_micron', 'options', [
+    //         "0.25 Micron",
+    //         "0.50 Micron",
+    //         "1.00 Micron",
+    //         "1.50 Micron",
+    //         "2.00 Micron",
+    //         "2.50 Micron",
+    //         "3.00 Micron",
+    //         "N/A",
+    //         "────────────────────",
+    //         "0.25 (2600 - 3000)",
+    //         "0.50 (2600 - 3000)",
+    //         "1.00 (2600 - 3000)",
+    //         "1.50 (2600 - 3000)",
+    //         "2.00 (2600 - 3000)",
+    //         "2.50 (2600 - 3000)",
+    //         "3.00 (2600 - 3000)",
+    //     ].join('\n'));
 
-        // Refresh field to apply new options
-        frm.refresh_field('micron');
+    //     // Refresh field to apply new options
+    //     frm.refresh_field('plat_micron');
 
-        if (!micron_value || micron_value === "N/A") {
-            frm.set_value('micron', "0.25 Micron");
-        }
+    //     if (!micron_value || micron_value === "N/A") {
+    //         frm.set_value('plat_micron', "0.25 Micron");
+    //     }
 
-        if (micron_value == "0.25 Micron" || micron_value == "0.50 Micron" || micron_value == "1.00 Micron" || micron_value == "1.50 Micron" ||
-            micron_value == "2.00 Micron" || micron_value == "2.50 Micron" || micron_value == "3.00 Micron" ||
-            micron_value == "0.25 (2600 - 3000)" || micron_value == "0.50 (2600 - 3000)" || micron_value == "1.00 (2600 - 3000)" || micron_value == "1.50 (2600 - 3000)" ||
-            micron_value == "2.00 (2600 - 3000)" || micron_value == "2.50 (2600 - 3000)" || micron_value == "3.00 (2600 - 3000)") {
-            plating_code += '-' + micron_value.split(' ')[0];
-        }
+    //     if (micron_value == "0.25 Micron" || micron_value == "0.50 Micron" || micron_value == "1.00 Micron" || micron_value == "1.50 Micron" ||
+    //         micron_value == "2.00 Micron" || micron_value == "2.50 Micron" || micron_value == "3.00 Micron" ||
+    //         micron_value == "0.25 (2600 - 3000)" || micron_value == "0.50 (2600 - 3000)" || micron_value == "1.00 (2600 - 3000)" || micron_value == "1.50 (2600 - 3000)" ||
+    //         micron_value == "2.00 (2600 - 3000)" || micron_value == "2.50 (2600 - 3000)" || micron_value == "3.00 (2600 - 3000)") {
+    //         plating_code += '-' + micron_value.split(' ')[0];
+    //     }
 
-        if (gold_kt_value == "18KT" || gold_kt_value == "24KT") {
-            plating_code += '-' + gold_kt_value.split(' ')[0];
-        }
+    //     if (gold_kt_value == "18KT" || gold_kt_value == "24KT") {
+    //         plating_code += '-' + gold_kt_value.split(' ')[0];
+    //     }
 
-        if (color_value == "9 kt" || color_value == "10 kt" || color_value == "12 kt" || color_value == "14 kt" || color_value == "18 kt" ||
-            color_value == "22 kt" || color_value == "24 kt") {
-            plating_code += '-' + color_value.split(' ')[0] + 'C';
-        }
+    //     if (color_value == "9 kt" || color_value == "10 kt" || color_value == "12 kt" || color_value == "14 kt" || color_value == "18 kt" ||
+    //         color_value == "22 kt" || color_value == "24 kt") {
+    //         plating_code += '-' + color_value.split(' ')[0] + 'C';
+    //     }
 
-        if (color_value == "Vintage" || color_value == "Hamilton") {
-            plating_code += '-' + color_value.split(' ')[0] + 'C';
-        }
+    //     if (color_value == "Vintage" || color_value == "Hamilton") {
+    //         plating_code += '-' + color_value.split(' ')[0] + 'C';
+    //     }
 
-        if (gold_value == "Yellow Gold") { plating_code += 'YG'; }
-        if (gold_value == "Rose Gold") { plating_code += 'RG'; }
+    //     if (gold_value == "Yellow Gold") { plating_code += 'YG'; }
+    //     if (gold_value == "Rose Gold") { plating_code += 'RG'; }
 
-        if (anti_tarnish_value == "AT") { plating_code += '-AT'; }
+    //     if (anti_tarnish_value == "AT") { plating_code += '-AT'; }
 
-    } else if (plating_value === "Flash Gold Plating") {
+    // } else if (plating_value === "Flash Gold Plating") {
 
 
 
-        frm.set_df_property('micron', 'read_only', 0);
-        frm.set_df_property('micron', 'options', [
-            "3 to 5 miles",
-            "3 to 5 miles (2600 - 3000)"
-        ].join('\n'));
-        frm.set_value('gold_kt', "N/A");
-        frm.set_value('anti_tarnish', "N/A");
-        frm.set_df_property('gold_kt', 'read_only', 1);
-        frm.set_df_property('anti_tarnish', 'read_only', 1);
+    //     frm.set_df_property('plat_micron', 'read_only', 0);
+    //     frm.set_df_property('plat_micron', 'options', [
+    //         "3 to 5 miles",
+    //         "3 to 5 miles (2600 - 3000)"
+    //     ].join('\n'));
+    //     frm.set_value('gold_kt', "N/A");
+    //     frm.set_value('anti_tarnish', "N/A");
+    //     frm.set_df_property('gold_kt', 'read_only', 1);
+    //     frm.set_df_property('anti_tarnish', 'read_only', 1);
 
-        if (color_value == "9 kt" || color_value == "10 kt" || color_value == "12 kt" || color_value == "14 kt" || color_value == "18 kt" ||
-            color_value == "22 kt" || color_value == "24 kt") {
-            plating_code += '-' + color_value.split(' ')[0] + 'C';
-        }
+    //     if (color_value == "9 kt" || color_value == "10 kt" || color_value == "12 kt" || color_value == "14 kt" || color_value == "18 kt" ||
+    //         color_value == "22 kt" || color_value == "24 kt") {
+    //         plating_code += '-' + color_value.split(' ')[0] + 'C';
+    //     }
 
-        if (color_value == "Vintage" || color_value == "Hamilton") {
-            plating_code += '-' + color_value.split(' ')[0] + 'C';
-        }
+    //     if (color_value == "Vintage" || color_value == "Hamilton") {
+    //         plating_code += '-' + color_value.split(' ')[0] + 'C';
+    //     }
 
-        if (gold_value == "Yellow Gold") { plating_code += 'YG'; }
-        if (gold_value == "Rose Gold") { plating_code += 'RG'; }
+    //     if (gold_value == "Yellow Gold") { plating_code += 'YG'; }
+    //     if (gold_value == "Rose Gold") { plating_code += 'RG'; }
 
-    } else if (plating_value === "Flash Rhodium") {
-        // frm.set_value('micron', 'Flash Rhodium');
-        // frm.set_df_property('micron', 'read_only', 1);
+    // } else if (plating_value === "Flash Rhodium") {
+    //     // frm.set_value('micron', 'Flash Rhodium');
+    //     // frm.set_df_property('micron', 'read_only', 1);
 
-        frm.set_df_property('micron', 'read_only', 0);
-        frm.set_df_property('micron', 'options', [
-            "Flash Rhodium",
-            "Flash Rhodium (2600 - 3000)"
-        ].join('\n'));
+    //     frm.set_df_property('plat_micron', 'read_only', 0);
+    //     frm.set_df_property('plat_micron', 'options', [
+    //         "Flash Rhodium",
+    //         "Flash Rhodium (2600 - 3000)"
+    //     ].join('\n'));
 
-        frm.set_value('gold_kt', "N/A");
-        frm.set_value('anti_tarnish', "N/A");
-        frm.set_df_property('gold_kt', 'read_only', 1);
-        frm.set_df_property('anti_tarnish', 'read_only', 1);
+    //     frm.set_value('gold_kt', "N/A");
+    //     frm.set_value('anti_tarnish', "N/A");
+    //     frm.set_df_property('gold_kt', 'read_only', 1);
+    //     frm.set_df_property('anti_tarnish', 'read_only', 1);
 
-        if (color_value == "9 kt" || color_value == "10 kt" || color_value == "12 kt" || color_value == "14 kt" || color_value == "18 kt" ||
-            color_value == "22 kt" || color_value == "24 kt") {
-            plating_code += '-' + color_value.split(' ')[0] + 'C';
-        }
+    //     if (color_value == "9 kt" || color_value == "10 kt" || color_value == "12 kt" || color_value == "14 kt" || color_value == "18 kt" ||
+    //         color_value == "22 kt" || color_value == "24 kt") {
+    //         plating_code += '-' + color_value.split(' ')[0] + 'C';
+    //     }
 
-        if (color_value == "Vintage" || color_value == "Hamilton") {
-            plating_code += '-' + color_value.split(' ')[0] + 'C';
-        }
+    //     if (color_value == "Vintage" || color_value == "Hamilton") {
+    //         plating_code += '-' + color_value.split(' ')[0] + 'C';
+    //     }
 
-        if (gold_value == "Yellow Gold") { plating_code += 'YG'; }
-        if (gold_value == "Rose Gold") { plating_code += 'RG'; }
+    //     if (gold_value == "Yellow Gold") { plating_code += 'YG'; }
+    //     if (gold_value == "Rose Gold") { plating_code += 'RG'; }
 
-    }
+    // }
 
     frm.set_value('code', plating_code);
 }
 
-function calculate_plating_pricing(frm) {
-    var product_type = frm.doc.product_type || '';
-    var micron = frm.doc.micron || '';
-    var uom_in_plating = frm.doc.uom_in_plating || '';
 
+// function fetch_plating_price_links(frm) {
+//     frappe.db.get_list("Plating Price", {
+//         // fields: ["*"],
+//         fields: ['plating', 'micron', 'uom_in_plating', 'product_type', 'plating_price'],
+//         filters: {
+//             plating: frm.doc.plating,
+//             micron: frm.doc.micron,
+//             product_type: frm.doc.product_type,
+//             uom_in_plating: frm.doc.uom_in_plating,
+//         },
+//     }).then((obj) => {
+//         for (var i = 0; i < obj.length; i++) {
+//             frm.set_value('plating_price', obj[i].plating_price);
+//         }
+//     });
+// }
+
+function fetch_plating_price_links(frm) {
+    console.log("Fetching with filters:", {
+        plating: frm.doc.plating,
+        micron: frm.doc.plat_micron,
+        product_type: frm.doc.type,
+        uom_in_plating: frm.doc.uom_in_plating,
+    });
+
+    frappe.db.get_list("Plating Price", {
+        fields: ['*'],
+        filters: {
+            plating: frm.doc.plating,
+            micron: frm.doc.plat_micron,
+            product_type: frm.doc.type,
+            uom_in_plating: frm.doc.uom_in_plating,
+        },
+    }).then((obj) => {
+        console.log("Found records:", obj);
+        if (obj.length > 0) {
+            frm.set_value('plating_price', obj[0].plating_price);
+        } else {
+            frm.set_value('plating_price', '');
+        }
+    });
+}
+
+function calculate_plating_pricing(frm) {
+    var micron = frm.doc.micron || '';
+    var product_type = frm.doc.product_type || '';
+    console.log("micron", micron);
+    console.log("product_type", product_type);
+    var uom_in_plating = frm.doc.uom_in_plating || '';
+    var plating_price = frm.doc.plating_price;
+    var plating_price_non_chain_products = 0;
     var micron_plating_ounce_rate = parseFloat(checkDigit(frm.doc.micron_plating_ounce_rate)) || 2500;
     var design_weightplating = parseFloat(checkDigit(frm.doc.design_weightplating));
     var surface_area = parseFloat(checkDigit(frm.doc.surface_area));
     var plating_charge = parseFloat(frm.doc.plating_charge);
+    console.log("uom_in_plating", uom_in_plating);
 
-    var plating_price = 0;
     var amount_in_dollar_in_plating = 0;
 
-    if (micron == "0.25 Micron") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 0.30; }
-            if (product_type == "NON - Chain Product") { plating_price = 0.20; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 0.40; }
-        }
-    }
-    if (micron == "0.50 Micron") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 0.80; }
-            if (product_type == "NON - Chain Product") { plating_price = 0.60; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 1.20; }
-        }
-    }
-    if (micron == "1.00 Micron") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 1.20; }
-            if (product_type == "NON - Chain Product") { plating_price = 1.00; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 1.80; }
-        }
-    }
-    if (micron == "1.50 Micron") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 1.80; }
-            if (product_type == "NON - Chain Product") { plating_price = 1.50; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 2.70; }
-        }
-    }
-    if (micron == "2.00 Micron") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 2.40; }
-            if (product_type == "NON - Chain Product") { plating_price = 2.00; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 3.60; }
-        }
-    }
-    if (micron == "2.50 Micron") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 3.00; }
-            if (product_type == "NON - Chain Product") { plating_price = 2.50; }
-            if (product_type == "18K Gold For Chains") { plating_price = 2.24; }
-            if (product_type == "24K Gold Plating For Non chain Products") { plating_price = 1.97; }
-            if (product_type == "18KT with .5 um 23KT Gold For Chains") { plating_price = 2.55; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 4.5; }
-        }
-    }
-    if (micron == "3.00 Micron") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 3.60; }
-            if (product_type == "NON - Chain Product") { plating_price = 3.00; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 5.40; }
-        }
-    }
-    if (micron == "3 to 5 miles") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 0.30; }
-            if (product_type == "NON - Chain Product") { plating_price = 0.20; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 0.40; }
-        }
-    }
-    if (micron == "Flash Rhodium") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "NON - Chain Product") { plating_price = 0.60; }
-        }
-    }
-
-
-
-
-
-    if (micron == "0.25 (2600 - 3000)") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 0.30; }
-            if (product_type == "NON - Chain Product") { plating_price = 0.20; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 0.40; }
-        }
-    }
-    if (micron == "0.50 (2600 - 3000)") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 1.00; }
-            if (product_type == "NON - Chain Product") { plating_price = 0.70; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 1.50; }
-        }
-    }
-    if (micron == "1.00 (2600 - 3000)") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 1.50; }
-            if (product_type == "NON - Chain Product") { plating_price = 1.20; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 2.20; }
-        }
-    }
-    if (micron == "1.50 (2600 - 3000)") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 2.20; }
-            if (product_type == "NON - Chain Product") { plating_price = 1.80; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 3.20; }
-        }
-    }
-    if (micron == "2.00 (2600 - 3000)") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 3.00; }
-            if (product_type == "NON - Chain Product") { plating_price = 2.40; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 4.40; }
-        }
-    }
-    if (micron == "2.50 (2600 - 3000)") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 3.60; }
-            if (product_type == "NON - Chain Product") { plating_price = 3.00; }
-            if (product_type == "18K Gold For Chains") { plating_price = 2.24; }
-            if (product_type == "24K Gold Plating For Non chain Products") { plating_price = 1.97; }
-            if (product_type == "18KT with .5 um 23KT Gold For Chains") { plating_price = 2.55; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 5.40; }
-        }
-    }
-    if (micron == "3.00 (2600 - 3000)") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 4.40; }
-            if (product_type == "NON - Chain Product") { plating_price = 3.60; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 6.50; }
-        }
-    }
-    if (micron == "3 to 5 miles (2600 - 3000)") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 0.35; }
-            if (product_type == "NON - Chain Product") { plating_price = 0.25; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 0.50; }
-        }
-    }
-    if (micron == "Flash Rhodium (2600 - 3000)") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "NON - Chain Product") { plating_price = 0.60; }
-        }
-    }
-
+    generate_code(frm)
+    fetch_plating_price_links(frm)
+    console.log("Fetching with filters:", {
+        plating: frm.doc.plating,
+        micron: frm.doc.micron,
+        product_type: frm.doc.product_type,
+        uom_in_plating: frm.doc.uom_in_plating,
+        plating_price: frm.doc.plating_price,
+    });
     var plating_price = parseFloat(checkDigit(plating_price)) * (parseFloat(checkDigit(micron_plating_ounce_rate) / 2500));
+    console.log("plating_price", plating_price);
     frm.set_value('plating_price_non_chain_products', parseFloat(checkDigit(plating_price)).toFixed(3));
-
+    console.log("plating_price_non_chain_products", plating_price_non_chain_products)
     plating_price = parseFloat(plating_price) + parseFloat(checkDigit(plating_charge));
     if (uom_in_plating === "Per Gram") {
         amount_in_dollar_in_plating = parseFloat(checkDigit(plating_price)) * parseFloat(checkDigit(design_weightplating));
@@ -2918,6 +2930,7 @@ function calculate_plating_pricing(frm) {
     if (uom_in_plating === "Per Pcs (On The Basis Of Surface Area)") {
         amount_in_dollar_in_plating = parseFloat(checkDigit(plating_price)) * (parseFloat(checkDigit(surface_area)) / 625);
     }
+    console.log("amount_in_dollar_in_plating", amount_in_dollar_in_plating)
     frm.set_value('amount_in_dollar_in_plating', parseFloat(checkDigit(amount_in_dollar_in_plating)).toFixed(3));
 
     calculate_other_plating_cost_master(frm);
@@ -2925,330 +2938,330 @@ function calculate_plating_pricing(frm) {
 
 
 
-function generate_code_second_plating(frm) {
-    var plating_value = frm.doc.plating_types;
-    var micron_value = frm.doc.microns;
-    var gold_kt_value = frm.doc.gold_kts;
-    var color_value = frm.doc.colors;
-    var gold_value = frm.doc.golds;
-    var anti_tarnish_value = frm.doc.anti_tarnishs;
+// function generate_code_second_plating(frm) {
+//     var plating_value = frm.doc.plating_types;
+//     var micron_value = frm.doc.microns;
+//     var gold_kt_value = frm.doc.gold_kts;
+//     var color_value = frm.doc.colors;
+//     var gold_value = frm.doc.golds;
+//     var anti_tarnish_value = frm.doc.anti_tarnishs;
 
-    var plating_codes = {
-        "Flash Gold Plating": "PLT-FLSH",
-        "Flash Rhodium": "PLT-FLSH",
-        "Micron Plating": "PLT-MIC",
-    };
+//     var plating_codes = {
+//         "Flash Gold Plating": "PLT-FLSH",
+//         "Flash Rhodium": "PLT-FLSH",
+//         "Micron Plating": "PLT-MIC",
+//     };
 
-    var plating_code = plating_codes[plating_value] || "";
-
-
-    // Handle plating thickness based on selected plating value
-    if (plating_value === "Micron Plating") {
-        frm.set_df_property('microns', 'read_only', 0);
-        frm.set_df_property('gold_kts', 'read_only', 0);
-        frm.set_df_property('colors', 'read_only', 0);
-        frm.set_df_property('golds', 'read_only', 0);
-        frm.set_df_property('anti_tarnishs', 'read_only', 0);
+//     var plating_code = plating_codes[plating_value] || "";
 
 
-        frm.set_df_property('microns', 'options', [
-            "0.25 Micron",
-            "0.50 Micron",
-            "1.00 Micron",
-            "1.50 Micron",
-            "2.00 Micron",
-            "2.50 Micron",
-            "3.00 Micron",
-            "N/A",
-            "────────────────────",
-            "0.25 (2600 - 3000)",
-            "0.50 (2600 - 3000)",
-            "1.00 (2600 - 3000)",
-            "1.50 (2600 - 3000)",
-            "2.00 (2600 - 3000)",
-            "2.50 (2600 - 3000)",
-            "3.00 (2600 - 3000)",
-        ].join('\n'));
+//     // Handle plating thickness based on selected plating value
+//     if (plating_value === "Micron Plating") {
+//         frm.set_df_property('microns', 'read_only', 0);
+//         frm.set_df_property('gold_kts', 'read_only', 0);
+//         frm.set_df_property('colors', 'read_only', 0);
+//         frm.set_df_property('golds', 'read_only', 0);
+//         frm.set_df_property('anti_tarnishs', 'read_only', 0);
 
 
-        if (!micron_value || micron_value === "N/A") {
-            frm.set_value('microns', "0.25 Micron");
-        }
-
-        if (micron_value == "0.25 Micron" || micron_value == "0.50 Micron" || micron_value == "1.00 Micron" || micron_value == "1.50 Micron" ||
-            micron_value == "2.00 Micron" || micron_value == "2.50 Micron" || micron_value == "3.00 Micron" ||
-            micron_value == "0.25 (2600 - 3000)" || micron_value == "0.50 (2600 - 3000)" || micron_value == "1.00 (2600 - 3000)" || micron_value == "1.50 (2600 - 3000)" ||
-            micron_value == "2.00 (2600 - 3000)" || micron_value == "2.50 (2600 - 3000)" || micron_value == "3.00 (2600 - 3000)") {
-            plating_code += '-' + micron_value.split(' ')[0];
-        }
-
-        if (gold_kt_value == "18KT" || gold_kt_value == "24KT") {
-            plating_code += '-' + gold_kt_value.split(' ')[0];
-        }
-
-        if (color_value == "9 kt" || color_value == "10 kt" || color_value == "12 kt" || color_value == "14 kt" || color_value == "18 kt" ||
-            color_value == "22 kt" || color_value == "24 kt") {
-            plating_code += '-' + color_value.split(' ')[0] + 'C';
-        }
-
-        if (color_value == "Vintage" || color_value == "Hamilton") {
-            plating_code += '-' + color_value.split(' ')[0] + 'C';
-        }
-
-        if (gold_value == "Yellow Gold") { plating_code += 'YG'; }
-        if (gold_value == "Rose Gold") { plating_code += 'RG'; }
-
-        if (anti_tarnish_value == "AT") { plating_code += '-AT'; }
-        // frm.set_df_property('micron', 'read_only', 0);
-
-    } else if (plating_value === "Flash Gold Plating") {
-
-        frm.set_df_property('microns', 'read_only', 0);
-        frm.set_df_property('microns', 'options', [
-            "3 to 5 miles",
-            "3 to 5 miles (2600 - 3000)"
-        ].join('\n'));
-        frm.set_value('gold_kts', "N/A");
-        frm.set_df_property('gold_kts', 'read_only', 1);
-        frm.set_value('anti_tarnishs', "N/A");
-        frm.set_df_property('anti_tarnishs', 'read_only', 1);
-
-        if (color_value == "9 kt" || color_value == "10 kt" || color_value == "12 kt" || color_value == "14 kt" || color_value == "18 kt" ||
-            color_value == "22 kt" || color_value == "24 kt") {
-            plating_code += '-' + color_value.split(' ')[0] + 'C';
-        }
-
-        if (color_value == "Vintage" || color_value == "Hamilton") {
-            plating_code += '-' + color_value.split(' ')[0] + 'C';
-        }
-
-        if (gold_value == "Yellow Gold") { plating_code += 'YG'; }
-        if (gold_value == "Rose Gold") { plating_code += 'RG'; }
-
-    } else if (plating_value === "Flash Rhodium") {
-        // frm.set_value('microns', 'Flash Rhodium');
-        // frm.set_df_property('microns', 'read_only', 1);
-        frm.set_df_property('micron', 'read_only', 0);
-        frm.set_df_property('micron', 'options', [
-            "Flash Rhodium",
-            "Flash Rhodium (2600 - 3000)"
-        ].join('\n'));
-        frm.set_value('gold_kts', "N/A");
-        frm.set_df_property('gold_kts', 'read_only', 1);
-        frm.set_value('anti_tarnishs', "N/A");
-        frm.set_df_property('anti_tarnishs', 'read_only', 1);
-
-        if (color_value == "9 kt" || color_value == "10 kt" || color_value == "12 kt" || color_value == "14 kt" || color_value == "18 kt" ||
-            color_value == "22 kt" || color_value == "24 kt") {
-            plating_code += '-' + color_value.split(' ')[0] + 'C';
-        }
-
-        if (color_value == "Vintage" || color_value == "Hamilton") {
-            plating_code += '-' + color_value.split(' ')[0] + 'C';
-        }
-
-        if (gold_value == "Yellow Gold") { plating_code += 'YG'; }
-        if (gold_value == "Rose Gold") { plating_code += 'RG'; }
-
-    }
-
-    frm.set_value('plating_codes', plating_code);
-}
+//         frm.set_df_property('microns', 'options', [
+//             "0.25 Micron",
+//             "0.50 Micron",
+//             "1.00 Micron",
+//             "1.50 Micron",
+//             "2.00 Micron",
+//             "2.50 Micron",
+//             "3.00 Micron",
+//             "N/A",
+//             "────────────────────",
+//             "0.25 (2600 - 3000)",
+//             "0.50 (2600 - 3000)",
+//             "1.00 (2600 - 3000)",
+//             "1.50 (2600 - 3000)",
+//             "2.00 (2600 - 3000)",
+//             "2.50 (2600 - 3000)",
+//             "3.00 (2600 - 3000)",
+//         ].join('\n'));
 
 
-function calculate_plating_pricing_second_plating(frm) {
-    var product_type = frm.doc.product_types || '';
-    var micron = frm.doc.microns || '';
-    var uom_in_plating = frm.doc.pric_uom || '';
+//         if (!micron_value || micron_value === "N/A") {
+//             frm.set_value('microns', "0.25 Micron");
+//         }
 
-    var micron_plating_ounce_rate = parseFloat(checkDigit(frm.doc.micron_plating_ounce_rate_second_plating)) || 2500;
-    var design_weightss = parseFloat(checkDigit(frm.doc.design_weightss));
-    var surface_area = parseFloat(checkDigit(frm.doc.surface));
-    var plating_charge = parseFloat(frm.doc.plating_charg);
+//         if (micron_value == "0.25 Micron" || micron_value == "0.50 Micron" || micron_value == "1.00 Micron" || micron_value == "1.50 Micron" ||
+//             micron_value == "2.00 Micron" || micron_value == "2.50 Micron" || micron_value == "3.00 Micron" ||
+//             micron_value == "0.25 (2600 - 3000)" || micron_value == "0.50 (2600 - 3000)" || micron_value == "1.00 (2600 - 3000)" || micron_value == "1.50 (2600 - 3000)" ||
+//             micron_value == "2.00 (2600 - 3000)" || micron_value == "2.50 (2600 - 3000)" || micron_value == "3.00 (2600 - 3000)") {
+//             plating_code += '-' + micron_value.split(' ')[0];
+//         }
 
-    var plating_price = 0;
-    var amount_in_dollar_in_plating = 0;
+//         if (gold_kt_value == "18KT" || gold_kt_value == "24KT") {
+//             plating_code += '-' + gold_kt_value.split(' ')[0];
+//         }
 
-    if (micron == "0.25 Micron") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 0.30; }
-            if (product_type == "NON - Chain Product") { plating_price = 0.20; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 0.40; }
-        }
-    }
-    if (micron == "0.50 Micron") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 0.80; }
-            if (product_type == "NON - Chain Product") { plating_price = 0.60; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 1.20; }
-        }
-    }
-    if (micron == "1.00 Micron") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 1.20; }
-            if (product_type == "NON - Chain Product") { plating_price = 1.00; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 1.80; }
-        }
-    }
-    if (micron == "1.50 Micron") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 1.80; }
-            if (product_type == "NON - Chain Product") { plating_price = 1.50; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 2.70; }
-        }
-    }
-    if (micron == "2.00 Micron") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 2.40; }
-            if (product_type == "NON - Chain Product") { plating_price = 2.00; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 3.60; }
-        }
-    }
-    if (micron == "2.50 Micron") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 3.00; }
-            if (product_type == "NON - Chain Product") { plating_price = 2.50; }
-            if (product_type == "18K Gold For Chains") { plating_price = 2.24; }
-            if (product_type == "24K Gold Plating For Non chain Products") { plating_price = 1.97; }
-            if (product_type == "18KT with .5 um 23KT Gold For Chains") { plating_price = 2.55; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 4.5; }
-        }
-    }
-    if (micron == "3.00 Micron") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 3.60; }
-            if (product_type == "NON - Chain Product") { plating_price = 3.00; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 5.40; }
-        }
-    }
-    if (micron == "3 to 5 miles") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 0.30; }
-            if (product_type == "NON - Chain Product") { plating_price = 0.20; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 0.40; }
-        }
-    }
-    if (micron == "Flash Rhodium") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "NON - Chain Product") { plating_price = 0.60; }
-        }
-    }
+//         if (color_value == "9 kt" || color_value == "10 kt" || color_value == "12 kt" || color_value == "14 kt" || color_value == "18 kt" ||
+//             color_value == "22 kt" || color_value == "24 kt") {
+//             plating_code += '-' + color_value.split(' ')[0] + 'C';
+//         }
+
+//         if (color_value == "Vintage" || color_value == "Hamilton") {
+//             plating_code += '-' + color_value.split(' ')[0] + 'C';
+//         }
+
+//         if (gold_value == "Yellow Gold") { plating_code += 'YG'; }
+//         if (gold_value == "Rose Gold") { plating_code += 'RG'; }
+
+//         if (anti_tarnish_value == "AT") { plating_code += '-AT'; }
+//         // frm.set_df_property('micron', 'read_only', 0);
+
+//     } else if (plating_value === "Flash Gold Plating") {
+
+//         frm.set_df_property('microns', 'read_only', 0);
+//         frm.set_df_property('microns', 'options', [
+// "3 to 5 miles",
+// "3 to 5 miles (2600 - 3000)"
+//         ].join('\n'));
+//         frm.set_value('gold_kts', "N/A");
+//         frm.set_df_property('gold_kts', 'read_only', 1);
+//         frm.set_value('anti_tarnishs', "N/A");
+//         frm.set_df_property('anti_tarnishs', 'read_only', 1);
+
+//         if (color_value == "9 kt" || color_value == "10 kt" || color_value == "12 kt" || color_value == "14 kt" || color_value == "18 kt" ||
+//             color_value == "22 kt" || color_value == "24 kt") {
+//             plating_code += '-' + color_value.split(' ')[0] + 'C';
+//         }
+
+//         if (color_value == "Vintage" || color_value == "Hamilton") {
+//             plating_code += '-' + color_value.split(' ')[0] + 'C';
+//         }
+
+//         if (gold_value == "Yellow Gold") { plating_code += 'YG'; }
+//         if (gold_value == "Rose Gold") { plating_code += 'RG'; }
+
+// } else if (plating_value === "Flash Rhodium") {
+//     // frm.set_value('microns', 'Flash Rhodium');
+//     // frm.set_df_property('microns', 'read_only', 1);
+//     frm.set_df_property('micron', 'read_only', 0);
+//     frm.set_df_property('micron', 'options', [
+//         "Flash Rhodium",
+//         "Flash Rhodium (2600 - 3000)"
+//         ].join('\n'));
+//         frm.set_value('gold_kts', "N/A");
+//         frm.set_df_property('gold_kts', 'read_only', 1);
+//         frm.set_value('anti_tarnishs', "N/A");
+//         frm.set_df_property('anti_tarnishs', 'read_only', 1);
+
+//         if (color_value == "9 kt" || color_value == "10 kt" || color_value == "12 kt" || color_value == "14 kt" || color_value == "18 kt" ||
+//             color_value == "22 kt" || color_value == "24 kt") {
+//             plating_code += '-' + color_value.split(' ')[0] + 'C';
+//         }
+
+//         if (color_value == "Vintage" || color_value == "Hamilton") {
+//             plating_code += '-' + color_value.split(' ')[0] + 'C';
+//         }
+
+//         if (gold_value == "Yellow Gold") { plating_code += 'YG'; }
+//         if (gold_value == "Rose Gold") { plating_code += 'RG'; }
+
+//     }
+
+//     frm.set_value('plating_codes', plating_code);
+// }
 
 
+// function calculate_plating_pricing_second_plating(frm) {
+//     var product_type = frm.doc.product_types || '';
+//     var micron = frm.doc.microns || '';
+//     var uom_in_plating = frm.doc.pric_uom || '';
 
-    if (micron == "0.25 (2600 - 3000)") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 0.30; }
-            if (product_type == "NON - Chain Product") { plating_price = 0.20; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 0.40; }
-        }
-    }
-    if (micron == "0.50 (2600 - 3000)") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 1.00; }
-            if (product_type == "NON - Chain Product") { plating_price = 0.70; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 1.50; }
-        }
-    }
-    if (micron == "1.00 (2600 - 3000)") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 1.50; }
-            if (product_type == "NON - Chain Product") { plating_price = 1.20; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 2.20; }
-        }
-    }
-    if (micron == "1.50 (2600 - 3000)") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 2.20; }
-            if (product_type == "NON - Chain Product") { plating_price = 1.80; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 3.20; }
-        }
-    }
-    if (micron == "2.00 (2600 - 3000)") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 3.00; }
-            if (product_type == "NON - Chain Product") { plating_price = 2.40; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 4.40; }
-        }
-    }
-    if (micron == "2.50 (2600 - 3000)") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 3.60; }
-            if (product_type == "NON - Chain Product") { plating_price = 3.00; }
-            if (product_type == "18K Gold For Chains") { plating_price = 2.24; }
-            if (product_type == "24K Gold Plating For Non chain Products") { plating_price = 1.97; }
-            if (product_type == "18KT with .5 um 23KT Gold For Chains") { plating_price = 2.55; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 5.40; }
-        }
-    }
-    if (micron == "3.00 (2600 - 3000)") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 4.40; }
-            if (product_type == "NON - Chain Product") { plating_price = 3.60; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 6.50; }
-        }
-    }
-    if (micron == "3 to 5 miles (2600 - 3000)") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "Chain Product") { plating_price = 0.35; }
-            if (product_type == "NON - Chain Product") { plating_price = 0.25; }
-        }
-        if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
-            if (product_type == "NON - Chain Product") { plating_price = 0.50; }
-        }
-    }
-    if (micron == "Flash Rhodium (2600 - 3000)") {
-        if (uom_in_plating == "Per Gram") {
-            if (product_type == "NON - Chain Product") { plating_price = 0.60; }
-        }
-    }
+//     var micron_plating_ounce_rate = parseFloat(checkDigit(frm.doc.micron_plating_ounce_rate_second_plating)) || 2500;
+//     var design_weightss = parseFloat(checkDigit(frm.doc.design_weightss));
+//     var surface_area = parseFloat(checkDigit(frm.doc.surface));
+//     var plating_charge = parseFloat(frm.doc.plating_charg);
 
-    var plating_price = parseFloat(checkDigit(plating_price)) * (parseFloat(checkDigit(micron_plating_ounce_rate) / 2500));
-    frm.set_value('plating_price_nn_chain_product', parseFloat(checkDigit(plating_price)).toFixed(3));
+//     var plating_price = 0;
+//     var amount_in_dollar_in_plating = 0;
 
-    plating_price = parseFloat(plating_price) + parseFloat(checkDigit(plating_charge));
+//     if (micron == "0.25 Micron") {
+//         if (uom_in_plating == "Per Gram") {
+//             if (product_type == "Chain Product") { plating_price = 0.30; }
+//             if (product_type == "NON - Chain Product") { plating_price = 0.20; }
+//         }
+//         if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
+//             if (product_type == "NON - Chain Product") { plating_price = 0.40; }
+//         }
+//     }
+//     if (micron == "0.50 Micron") {
+//         if (uom_in_plating == "Per Gram") {
+//             if (product_type == "Chain Product") { plating_price = 0.80; }
+//             if (product_type == "NON - Chain Product") { plating_price = 0.60; }
+//         }
+//         if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
+//             if (product_type == "NON - Chain Product") { plating_price = 1.20; }
+//         }
+//     }
+//     if (micron == "1.00 Micron") {
+//         if (uom_in_plating == "Per Gram") {
+//             if (product_type == "Chain Product") { plating_price = 1.20; }
+//             if (product_type == "NON - Chain Product") { plating_price = 1.00; }
+//         }
+//         if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
+//             if (product_type == "NON - Chain Product") { plating_price = 1.80; }
+//         }
+//     }
+//     if (micron == "1.50 Micron") {
+//         if (uom_in_plating == "Per Gram") {
+//             if (product_type == "Chain Product") { plating_price = 1.80; }
+//             if (product_type == "NON - Chain Product") { plating_price = 1.50; }
+//         }
+//         if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
+//             if (product_type == "NON - Chain Product") { plating_price = 2.70; }
+//         }
+//     }
+//     if (micron == "2.00 Micron") {
+//         if (uom_in_plating == "Per Gram") {
+//             if (product_type == "Chain Product") { plating_price = 2.40; }
+//             if (product_type == "NON - Chain Product") { plating_price = 2.00; }
+//         }
+//         if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
+//             if (product_type == "NON - Chain Product") { plating_price = 3.60; }
+//         }
+//     }
+//     if (micron == "2.50 Micron") {
+//         if (uom_in_plating == "Per Gram") {
+//             if (product_type == "Chain Product") { plating_price = 3.00; }
+//             if (product_type == "NON - Chain Product") { plating_price = 2.50; }
+//             if (product_type == "18K Gold For Chains") { plating_price = 2.24; }
+//             if (product_type == "24K Gold Plating For Non chain Products") { plating_price = 1.97; }
+//             if (product_type == "18KT with .5 um 23KT Gold For Chains") { plating_price = 2.55; }
+//         }
+//         if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
+//             if (product_type == "NON - Chain Product") { plating_price = 4.5; }
+//         }
+//     }
+//     if (micron == "3.00 Micron") {
+//         if (uom_in_plating == "Per Gram") {
+//             if (product_type == "Chain Product") { plating_price = 3.60; }
+//             if (product_type == "NON - Chain Product") { plating_price = 3.00; }
+//         }
+//         if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
+//             if (product_type == "NON - Chain Product") { plating_price = 5.40; }
+//         }
+//     }
+//     if (micron == "3 to 5 miles") {
+//         if (uom_in_plating == "Per Gram") {
+//             if (product_type == "Chain Product") { plating_price = 0.30; }
+//             if (product_type == "NON - Chain Product") { plating_price = 0.20; }
+//         }
+//         if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
+//             if (product_type == "NON - Chain Product") { plating_price = 0.40; }
+//         }
+//     }
+//     if (micron == "Flash Rhodium") {
+//         if (uom_in_plating == "Per Gram") {
+//             if (product_type == "NON - Chain Product") { plating_price = 0.60; }
+//         }
+//     }
 
-    if (uom_in_plating === "Per Gram") {
-        amount_in_dollar_in_plating = parseFloat(checkDigit(plating_price)) * parseFloat(checkDigit(design_weightss));
-    }
-    if (uom_in_plating === "Per Pcs (On The Basis Of Surface Area)") {
-        amount_in_dollar_in_plating = parseFloat(checkDigit(plating_price)) * (parseFloat(checkDigit(surface_area)) / 625);
-    }
 
-    frm.set_value('amounts', parseFloat(checkDigit(amount_in_dollar_in_plating)).toFixed(3));
 
-    calculate_other_plating_cost_master(frm);
-}
+//     if (micron == "0.25 (2600 - 3000)") {
+//         if (uom_in_plating == "Per Gram") {
+//             if (product_type == "Chain Product") { plating_price = 0.30; }
+//             if (product_type == "NON - Chain Product") { plating_price = 0.20; }
+//         }
+//         if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
+//             if (product_type == "NON - Chain Product") { plating_price = 0.40; }
+//         }
+//     }
+//     if (micron == "0.50 (2600 - 3000)") {
+//         if (uom_in_plating == "Per Gram") {
+//             if (product_type == "Chain Product") { plating_price = 1.00; }
+//             if (product_type == "NON - Chain Product") { plating_price = 0.70; }
+//         }
+//         if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
+//             if (product_type == "NON - Chain Product") { plating_price = 1.50; }
+//         }
+//     }
+//     if (micron == "1.00 (2600 - 3000)") {
+//         if (uom_in_plating == "Per Gram") {
+//             if (product_type == "Chain Product") { plating_price = 1.50; }
+//             if (product_type == "NON - Chain Product") { plating_price = 1.20; }
+//         }
+//         if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
+//             if (product_type == "NON - Chain Product") { plating_price = 2.20; }
+//         }
+//     }
+//     if (micron == "1.50 (2600 - 3000)") {
+//         if (uom_in_plating == "Per Gram") {
+//             if (product_type == "Chain Product") { plating_price = 2.20; }
+//             if (product_type == "NON - Chain Product") { plating_price = 1.80; }
+//         }
+//         if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
+//             if (product_type == "NON - Chain Product") { plating_price = 3.20; }
+//         }
+//     }
+//     if (micron == "2.00 (2600 - 3000)") {
+//         if (uom_in_plating == "Per Gram") {
+//             if (product_type == "Chain Product") { plating_price = 3.00; }
+//             if (product_type == "NON - Chain Product") { plating_price = 2.40; }
+//         }
+//         if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
+//             if (product_type == "NON - Chain Product") { plating_price = 4.40; }
+//         }
+//     }
+//     if (micron == "2.50 (2600 - 3000)") {
+//         if (uom_in_plating == "Per Gram") {
+//             if (product_type == "Chain Product") { plating_price = 3.60; }
+//             if (product_type == "NON - Chain Product") { plating_price = 3.00; }
+//             if (product_type == "18K Gold For Chains") { plating_price = 2.24; }
+//             if (product_type == "24K Gold Plating For Non chain Products") { plating_price = 1.97; }
+//             if (product_type == "18KT with .5 um 23KT Gold For Chains") { plating_price = 2.55; }
+//         }
+//         if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
+//             if (product_type == "NON - Chain Product") { plating_price = 5.40; }
+//         }
+//     }
+//     if (micron == "3.00 (2600 - 3000)") {
+//         if (uom_in_plating == "Per Gram") {
+//             if (product_type == "Chain Product") { plating_price = 4.40; }
+//             if (product_type == "NON - Chain Product") { plating_price = 3.60; }
+//         }
+//         if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
+//             if (product_type == "NON - Chain Product") { plating_price = 6.50; }
+//         }
+//     }
+//     if (micron == "3 to 5 miles (2600 - 3000)") {
+//         if (uom_in_plating == "Per Gram") {
+//             if (product_type == "Chain Product") { plating_price = 0.35; }
+//             if (product_type == "NON - Chain Product") { plating_price = 0.25; }
+//         }
+//         if (uom_in_plating == "Per Pcs (On The Basis Of Surface Area)") {
+//             if (product_type == "NON - Chain Product") { plating_price = 0.50; }
+//         }
+//     }
+//     if (micron == "Flash Rhodium (2600 - 3000)") {
+//         if (uom_in_plating == "Per Gram") {
+//             if (product_type == "NON - Chain Product") { plating_price = 0.60; }
+//         }
+//     }
+
+//     var plating_price = parseFloat(checkDigit(plating_price)) * (parseFloat(checkDigit(micron_plating_ounce_rate) / 2500));
+//     frm.set_value('plating_price_nn_chain_product', parseFloat(checkDigit(plating_price)).toFixed(3));
+
+//     plating_price = parseFloat(plating_price) + parseFloat(checkDigit(plating_charge));
+
+//     if (uom_in_plating === "Per Gram") {
+//         amount_in_dollar_in_plating = parseFloat(checkDigit(plating_price)) * parseFloat(checkDigit(design_weightss));
+//     }
+//     if (uom_in_plating === "Per Pcs (On The Basis Of Surface Area)") {
+//         amount_in_dollar_in_plating = parseFloat(checkDigit(plating_price)) * (parseFloat(checkDigit(surface_area)) / 625);
+//     }
+
+//     frm.set_value('amounts', parseFloat(checkDigit(amount_in_dollar_in_plating)).toFixed(3));
+
+//     calculate_other_plating_cost_master(frm);
+// }
 
 
 function other_plating_calculations(frm, cdt, cdn) {

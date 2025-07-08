@@ -133,6 +133,11 @@ frappe.ui.form.on("DT Bag Transaction", {
 	out_time: function (frm, cdt, cdn) {
 		updateOutTimeManually(frm, cdt, cdn)
 	},
+
+	// total_stone_man : function (frm,cdt,cdn){
+	// 	frappe.model.set_value ('total_stone_man', stone_qty * bag_quantity)
+	// },
+
 	in_quantity: function (frm, cdt, cdn) {
 		calculate_weight(frm, cdt, cdn);
 		// frm.enable_save();
@@ -155,6 +160,15 @@ frappe.ui.form.on("DT Bag Transaction", {
 		//     frm.disable_save();
 		// }
 	},
+
+	bag_quantity:function (frm,cdt,cdn){
+		calculate_total_stone_man(frm, cdt, cdn);
+	},
+
+	stone_qty:function (frm,cdt,cdn){
+		calculate_total_stone_man(frm, cdt, cdn);
+	}
+
 
 
 	// update_out_time: function (frm, cdt, cdn) {
@@ -209,10 +223,20 @@ function calculate_weight(frm, cdt, cdn) {
 	frappe.model.set_value(cdt, cdn, 'total_diamond_quantity', parseFloat(parseFloat(checkDigit(child.in_quantity)) * parseFloat(checkDigit(child.diamond_quantity))).toFixed(1));
 	frappe.model.set_value(cdt, cdn, 'total_wax_set_quantity', parseFloat(parseFloat(checkDigit(child.in_quantity)) * parseFloat(checkDigit(child.wax_set_quantity))).toFixed(1));
 	frappe.model.set_value(cdt, cdn, 'total_hand_set_quantity', parseFloat(parseFloat(checkDigit(child.in_quantity)) * parseFloat(checkDigit(child.hand_set_quantity))).toFixed(1));
+	// frappe.model.set_value(cdt, cdn, 'total_stone_man', parseFloat(parseFloat(checkDigit(child.bag_quantity)) * parseFloat(checkDigit(child.stone_qty))).toFixed(4));
 
 }
 
 
+
+
+function calculate_total_stone_man(frm, cdt, cdn) {
+	var child = locals[cdt][cdn];
+	var total_stone_man = parseFloat(parseFloat(checkDigit(child.bag_quantity)) * parseFloat(checkDigit(child.stone_qty))).toFixed(4);
+
+	frappe.model.set_value(cdt, cdn, 'total_stone_man', parseFloat(parseFloat(checkDigit(total_stone_man)).toFixed(4)));
+
+}
 
 
 function update_bag_transaction(frm, data, field_name, table_name, emp_code, emp_name, emp_sub_dpt, emp_designation) {
@@ -368,6 +392,7 @@ function update_bag_details(frm, cdt, cdn, table_name) {
 							frappe.model.set_value(frm.doc[table_name][i].doctype, frm.doc[table_name][i].name, "total_hand_set_quantity", parseFloat(parseFloat(checkDigit(obj.data.BQty)) * parseFloat(checkDigit(obj.data.stone_hset_qty))).toFixed(3));
 							frappe.model.set_value(frm.doc[table_name][i].doctype, frm.doc[table_name][i].name, "total_diamond_quantity", parseFloat(parseFloat(checkDigit(obj.data.BQty)) * parseFloat(checkDigit(obj.data.dia_qty))).toFixed(3));
 							frappe.model.set_value(frm.doc[table_name][i].doctype, frm.doc[table_name][i].name, "total_design_bom_weight", parseFloat(parseFloat(checkDigit(obj.data.BQty)) * parseFloat(checkDigit(obj.data.bom_wt))).toFixed(3));
+							
 
 							calculate_weight(frm, frm.doc[table_name][i].doctype, frm.doc[table_name][i].name);
 						}

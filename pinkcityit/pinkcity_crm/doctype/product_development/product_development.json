@@ -18,7 +18,6 @@
   "primary_assigned",
   "column_break_c9qus",
   "customer_name",
-  "costing_id",
   "column_break_swhpy",
   "customer_code",
   "opportunity_no",
@@ -45,6 +44,10 @@
   "imgdrw2",
   "amended_from",
   "pd_sheet_tab",
+  "costing_id",
+  "fetch_costing",
+  "column_break_pbd6x",
+  "column_break_zpjke",
   "product_details_section",
   "2d_design_no",
   "column_break_fg4yz",
@@ -118,14 +121,7 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Opportunity No",
-   "options": "Opportunity New",
-   "read_only": 1
-  },
-  {
-   "fieldname": "costing_id",
-   "fieldtype": "Link",
-   "label": "Costing ID",
-   "options": "Costing",
+   "options": "Opportunity F",
    "read_only": 1
   },
   {
@@ -291,7 +287,7 @@
    "fieldtype": "Link",
    "label": "Amended From",
    "no_copy": 1,
-   "options": "NPD",
+   "options": "Product Development",
    "print_hide": 1,
    "search_index": 1
   },
@@ -433,7 +429,7 @@
    "fieldname": "plating_details",
    "fieldtype": "Table",
    "label": "Plating Details",
-   "options": "NPD Plating CT"
+   "options": "NPD Plating CT F"
   },
   {
    "fieldname": "3d_attachment_tab",
@@ -548,6 +544,25 @@
    "fieldname": "primary_assigned",
    "fieldtype": "Data",
    "label": "Primary Assigned"
+  },
+  {
+   "fieldname": "fetch_costing",
+   "fieldtype": "Button",
+   "label": "Fetch Costing Details"
+  },
+  {
+   "fieldname": "column_break_pbd6x",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "costing_id",
+   "fieldtype": "Link",
+   "label": "Costing ID",
+   "options": "Costing"
+  },
+  {
+   "fieldname": "column_break_zpjke",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -564,10 +579,10 @@
    "link_fieldname": "name"
   }
  ],
- "modified": "2025-05-22 17:42:18.409356",
+ "modified": "2025-07-03 10:59:10.958919",
  "modified_by": "Administrator",
  "module": "PinkCity CRM",
- "name": "NPD",
+ "name": "Product Development",
  "name_case": "Title Case",
  "naming_rule": "Expression (old style)",
  "owner": "Administrator",

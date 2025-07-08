@@ -4,15 +4,15 @@
 import frappe
 from frappe.model.document import Document
 
-class NPD(Document):
+class ProductDevelopment(Document):
 	def validate(self):
 		self.workflow_states = self.workflow_state
 		self.status = self.workflow_state
 
 @frappe.whitelist()
-def create_npd_from_opp() :
-	npd = frappe.form_dict.get("npd", False)
-	opportunity_no = frappe.form_dict.get("opportunity_new_no", "")
+def create_product_development_from_opp() :
+	product_development = frappe.form_dict.get("product_development", False)
+	opportunity_no = frappe.form_dict.get("opportunity_no", "")
 	product_specification = frappe.form_dict.get("product_specification", "")
 	customer_name = frappe.form_dict.get("customer_name", "")
 	opportunity_owner = frappe.form_dict.get("opportunity_owner", "")
@@ -24,14 +24,14 @@ def create_npd_from_opp() :
 
 
 	data = {}
-	if npd:
-		npd_doc = frappe.get_doc('NPD', npd)
+	if product_development:
+		product_development_doc = frappe.get_doc('ProductDevelopment', product_development)
 		data['status'] = False
-		data['data'] = npd_doc
-		data['msg'] = "NPD Sheet already exists."
+		data['data'] = product_development_doc
+		data['msg'] = "ProductDevelopment Sheet already exists."
 		frappe.response["data"] = data
 	else :
-		doc = frappe.new_doc('NPD')
+		doc = frappe.new_doc('ProductDevelopment')
 		doc.opportunity_no = opportunity_no
 		doc.opportunity_owner = opportunity_owner
 		doc.customer_name = customer_name
@@ -178,7 +178,7 @@ def create_npd_from_opp() :
 		doc.save()
 		data['status'] = True
 		data['data'] = doc
-		data['msg'] = "NPD Sheet added."
+		data['msg'] = "ProductDevelopment Sheet added."
 		frappe.response["data"] = data
 
 

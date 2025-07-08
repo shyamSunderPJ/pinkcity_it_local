@@ -1,4 +1,4 @@
-frappe.ui.form.on('Opportunity New', {
+frappe.ui.form.on('Opportunity F', {
 	refresh(frm) {
 		frm.set_query('assigned_to', 'development_details', (frm, cdt, cdn) => {
 			var child = locals[cdt][cdn];
@@ -40,7 +40,7 @@ frappe.ui.form.on('Opportunity New', {
 });
 
 // First table ---------------------------------------------
-frappe.ui.form.on('Opp NPD CT', {
+frappe.ui.form.on('Opp NPD CT F', {
 	// Process Section -------------------------
 	req_quotation: function (frm, cdt, cdn) {
 		update_costing_opp(frm, cdt, cdn);
@@ -90,7 +90,7 @@ frappe.ui.form.on('Opp NPD CT', {
 	npd_client_status: function (frm, cdt, cdn) {
 		var child = locals[cdt][cdn];
 		if (child.npd_client_status == "Accepted") {
-			frappe.model.set_value(cdt, cdn, 'costing_npd_id', child.npd);
+			frappe.model.set_value(cdt, cdn, 'costing_npd_id', child.product_development);
 		}
 	}
 });
@@ -99,7 +99,7 @@ function createNPDOpp(frm, cdt, cdn) {
 	var child = locals[cdt][cdn];
 	frappe.dom.freeze();
 	frappe.call({
-		method: "pinkcityit.pinkcity_crm.doctype.npd.npd.create_npd_from_opp",
+		method: "pinkcityit.pinkcity_crm.doctype.product_development.product_development.create_product_development_from_opp",
 		type: "POST",
 		args: {
 			'customer_name': frm.doc.party_name,
@@ -109,9 +109,9 @@ function createNPDOpp(frm, cdt, cdn) {
 			'designer': child.npd_assigned,
 			'attachment': child.npd_attachment,
 			'assigner_name': frm.doc.owner,
-			'npd': child.npd,
+			'product_development': child.product_development,
 			'costing': child.costing,
-			'primary_assigner' : child.primary_assigner
+			'primary_assigner': child.primary_assigner
 		},
 		error: function (obj) {
 			console.log("hi227");
@@ -122,7 +122,7 @@ function createNPDOpp(frm, cdt, cdn) {
 			if (obj.data) {
 				if (obj.data.status) {
 					console.log("#125")
-					frappe.model.set_value(cdt, cdn, 'npd', obj.data.data.name);
+					frappe.model.set_value(cdt, cdn, 'product_development', obj.data.data.name);
 					fetch_npd_status(frm, cdt, cdn)
 					frm.save();
 				}
@@ -149,7 +149,7 @@ function createCostingOpp(frm, cdt, cdn) {
 			'opportunity__id': frm.doc.name,
 			'assigned_to': child.assigned_to,
 			'attachment': child.attachment,
-			'npd': child.npd
+			'product_development': child.npd
 		},
 		error: function (obj) {
 			console.log("hi22");
@@ -187,7 +187,7 @@ function fetch_npd_costing_status(frm) {
 function fetch_npd_status(frm, cdt, cdn) {
 	var child = locals[cdt][cdn];
 	if (child.npd) {
-		frappe.db.get_list("NPD", {
+		frappe.db.get_list("Product Development", {
 			fields: ["*"],
 			filters: { name: child.npd },
 		}).then((obj) => {

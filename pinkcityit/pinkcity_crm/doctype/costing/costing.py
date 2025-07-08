@@ -272,7 +272,7 @@ def send_opportunity_details() :
 	design_code_2d = frappe.form_dict.get("design_code", False)
 	customer_design_code = frappe.form_dict.get("customer_item_code", False)
 	design_category = frappe.form_dict.get("itemproduct_category", False)
-	npd_id = frappe.form_dict.get("npd_id", False)
+	product_development = frappe.form_dict.get("product_development", False)
 	stone_child = frappe.form_dict.get("stone_details")
 	costing = frappe.form_dict.get("costing", "")
 	assigned_to = frappe.form_dict.get("assigned_to", "")
@@ -305,15 +305,14 @@ def send_opportunity_details() :
 		doc.design_category = design_category
 		doc.assigned_to = assigned_to
 		doc.opportunity__id = opportunity__id
-		doc.stone_child = stone_child
 		if attachment :
 			field_name = 'image'
 			setattr(doc, field_name, attachment)
 			# doc.attached = attachment
 
-		if npd_id :
-			npd_doc = frappe.get_doc('NPD', npd_id)
-			doc.npd_id = npd_id
+		if product_development :
+			npd_doc = frappe.get_doc('Product Development', product_development)
+			doc.product_development = product_development
 			stone_child = npd_doc.get('stone_details', [])
 			if stone_child :
 				for row in stone_child:
@@ -376,7 +375,7 @@ def send_opportunity_details() :
 			doc.image = npd_doc.get('2d_drawing', '')
 			doc.design__type = '2D Design'
 
-		doc.save()
+			doc.save()
 
 		data["status"] = True
 		data["data"] = doc
